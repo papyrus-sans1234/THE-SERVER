@@ -1,0 +1,47 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE SERVER</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <div class="logo">THE SERVER</div>
+        <div class="status">SYSTEM ONLINE</div>
+    </header>
+
+    <main>
+        <section id="world">
+            <div class="location">
+                <span id="region-name">UNKNOWN REGION</span>
+                <h1 id="room-name">INITIAL ROOM</h1>
+            </div>
+
+            <div id="room-content">
+                <div class="dummy">
+                    <div class="dummy-icon">◈</div>
+                    <h2>COMBAT DUMMY</h2>
+                    <p>Training entity detected.</p>
+                    <button id="fight-button">INITIATE COMBAT</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="combat-screen" class="hidden">
+            <div id="combat-info"></div>
+            <div id="combat-actions"></div>
+            <div id="combat-log">Combat initialized.</div>
+        </section>
+    </main>
+
+    <footer>
+        THE SERVER // DEVELOPMENT BUILD 0.01
+    </footer>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
