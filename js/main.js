@@ -32,6 +32,15 @@ import {
 
 import { showStartScreen } from './startScreen.js';
 
+// MOVEMENT SETTINGS
+
+let heldDirection = null;
+let heldKey = null;
+let movementFrame = null;
+let lastMoveTime = 0;
+
+const MOVE_INTERVAL = 135;
+
 // RENDERING
 
 function renderGame() {
@@ -42,14 +51,28 @@ function renderGame() {
   updateHUD();
 }
 
+// STOP MOVEMENT
+
+function stopAllMovement() {
+  heldDirection = null;
+  heldKey = null;
+
+  if (movementFrame !== null) {
+    cancelAnimationFrame(movementFrame);
+    movementFrame = null;
+  }
+}
+
 // NEW GAME
 
 function startNewGame(createdAvatar) {
+  stopAllMovement();
+
   // Apply the created character.
   state.player.name = createdAvatar.name;
   state.avatar = createdAvatar;
 
-  // Reset starting position.
+  // Reset starting position and stats.
   state.player.hp = 30;
   state.player.x = 7;
   state.player.y = 7;
@@ -83,6 +106,8 @@ function startNewGame(createdAvatar) {
 // CONTINUE
 
 function continueGame() {
+  stopAllMovement();
+
   const loaded = loadGame();
 
   if (!loaded) {
@@ -106,36 +131,83 @@ window.addEventListener('server:continue-game', () => {
   continueGame();
 });
 
-// MOVEMENT
+// MOVEMENT DIRECTIONS
 
-function handleMovement(key) {
-  const directions = {
-    w: [0, -1],
-    ArrowUp: [0, -1],
+const directions = {
+  w: [0, -1],
+  ArrowUp: [0, -1],
 
-    s: [0, 1],
-    ArrowDown: [0, 1],
+  s: [0, 1],
+  ArrowDown: [0, 1],
 
-    a: [-1, 0],
-    ArrowLeft: [-1, 0],
+  a: [-1, 0],
+  ArrowLeft: [-1, 0],
 
-    d: [1, 0],
-    ArrowRight: [1, 0]
-  };
+  d: [1, 0],
+  ArrowRight: [1, 0]
+};
 
+// MOVEMENT LOOP
+
+function movementLoop(timestamp) {
+  if (!heldDirection) {
+    movementFrame = null;
+    return;
+  }
+
+  // Prevent movement during menus, dialogue or combat.
+  if (
+    state.inCombat ||
+    state.dialogue ||
+    document.getElementById('server-start') ||
+    document.getElementById('avatar-creator')
+  ) {
+    stopAllMovement();
+    return;
+  }
+
+  if (timestamp - lastMoveTime >= MOVE_INTERVAL) {
+    lastMoveTime = timestamp;
+
+    const moved = movePlayer(
+      heldDirection[0],
+      heldDirection[1]
+    );
+
+    if (moved) {
+      checkDoor();
+      renderGame();
+    }
+  }
+
+  movementFrame = requestAnimationFrame(movementLoop);
+}
+
+// START HOLDING A MOVEMENT KEY
+
+function startMovement(key) {
   const direction = directions[key];
 
   if (!direction) return;
 
-  const moved = movePlayer(
-    direction[0],
-    direction[1]
-  );
+  // Ignore repeated keydown events for the same held key.
+  if (heldKey === key) return;
 
-  if (!moved) return;
+  heldKey = key;
+  heldDirection = direction;
 
-  checkDoor();
-  renderGame();
+  if (movementFrame === null) {
+    lastMoveTime = 0;
+    movementFrame = requestAnimationFrame(movementLoop);
+  }
+}
+
+// STOP HOLDING A MOVEMENT KEY
+
+function stopMovement(key) {
+  if (heldKey !== key) return;
+
+  stopAllMovement();
 }
 
 // INTERACTION
@@ -153,6 +225,7 @@ function interact() {
       Math.abs(state.player.y - dummy.y);
 
     if (distance <= 1) {
+      stopAllMovement();
       startCombat('combatDummy');
       return;
     }
@@ -176,14 +249,19 @@ function interact() {
   renderGame();
 }
 
-// KEYBOARD
+// KEYBOARD INPUT
 
 document.addEventListener('keydown', event => {
   const key = event.key;
 
   if (
-    ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ']
-      .includes(key)
+    [
+      'ArrowUp',
+      'ArrowDown',
+      'ArrowLeft',
+      'ArrowRight',
+      ' '
+    ].includes(key)
   ) {
     event.preventDefault();
   }
@@ -198,7 +276,10 @@ document.addEventListener('keydown', event => {
     return;
   }
 
+  // Dialogue controls.
   if (state.dialogue) {
+    stopAllMovement();
+
     if (
       key === 'Enter' ||
       key.toLowerCase() === 'e'
@@ -209,20 +290,37 @@ document.addEventListener('keydown', event => {
     return;
   }
 
+  // Combat controls.
   if (state.inCombat) {
+    stopAllMovement();
     handleCombatKey(event);
     return;
   }
 
+  // Interaction.
   if (key.toLowerCase() === 'e') {
+    stopAllMovement();
     interact();
     return;
   }
 
-  handleMovement(key);
+  // Continuous movement.
+  startMovement(key);
 });
 
-// COMBAT BUTTONS
+// KEY RELEASE
+
+document.addEventListener('keyup', event => {
+  stopMovement(event.key);
+});
+
+// STOP MOVEMENT WHEN WINDOW LOSES FOCUS
+
+window.addEventListener('blur', () => {
+  stopAllMovement();
+});
+
+// COMBAT MENU BUTTONS
 
 document.getElementById('battle-menu')
   .addEventListener('click', event => {
@@ -235,6 +333,8 @@ document.getElementById('battle-menu')
       Number(button.dataset.index || 0)
     );
   });
+
+// COMBAT SUBMENU BUTTONS
 
 document.getElementById('battle-submenu')
   .addEventListener('click', event => {
@@ -251,7 +351,10 @@ document.getElementById('battle-submenu')
 // DIALOGUE BUTTON
 
 document.getElementById('dialogue-next')
-  .addEventListener('click', advanceDialogue);
+  .addEventListener('click', () => {
+    stopAllMovement();
+    advanceDialogue();
+  });
 
 // SAVE BUTTON
 
