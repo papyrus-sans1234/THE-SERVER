@@ -1,47 +1,158 @@
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>THE SERVER</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#080d18">
+  <title>THE SERVER — Prototype</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <header class="topbar">
+    <div class="brand">THE <span>SERVER</span></div>
+    <div class="system-status">
+      <i></i> SYSTEM ONLINE
+      <b id="build-label">DEV BUILD 0.01</b>
+    </div>
+  </header>
 
-    <header>
-        <div class="logo">THE SERVER</div>
-        <div class="status">SYSTEM ONLINE</div>
-    </header>
+  <main class="layout">
+    <section class="game-panel">
+      <div class="location-bar">
+        <div>
+          <small>REGION</small>
+          <strong id="region-name">THE ARRIVAL ZONE</strong>
+        </div>
+        <div>
+          <small>CURRENT ROOM</small>
+          <strong id="room-name">INITIAL CHAMBER</strong>
+        </div>
+      </div>
 
-    <main>
-        <section id="world">
-            <div class="location">
-                <span id="region-name">UNKNOWN REGION</span>
-                <h1 id="room-name">INITIAL ROOM</h1>
+      <div id="world-view" class="world-view">
+        <div id="world-grid" class="world-grid" aria-label="Room map"></div>
+        <div class="world-hint">
+          MOVE: WASD / ARROW KEYS · INTERACT: E
+        </div>
+      </div>
+
+      <section id="combat-view" class="combat-view hidden">
+        <div class="combat-heading">
+          <span>ENCOUNTER DETECTED</span>
+          <span id="combat-turn">TURN 01</span>
+        </div>
+
+        <div class="combatants">
+          <div class="combatant">
+            <small>PLAYER</small>
+            <strong id="player-hp-label">30 / 30 HP</strong>
+            <div class="hp-track">
+              <i id="player-hp-fill"></i>
             </div>
+          </div>
 
-            <div id="room-content">
-                <div class="dummy">
-                    <div class="dummy-icon">◈</div>
-                    <h2>COMBAT DUMMY</h2>
-                    <p>Training entity detected.</p>
-                    <button id="fight-button">INITIATE COMBAT</button>
-                </div>
+          <div class="versus">VS</div>
+
+          <div class="combatant enemy-card">
+            <small id="enemy-type">TRAINING ENTITY</small>
+            <strong id="enemy-name">COMBAT DUMMY</strong>
+            <div class="hp-track">
+              <i id="enemy-hp-fill"></i>
             </div>
-        </section>
+            <strong id="enemy-hp-label">40 / 40 HP</strong>
+          </div>
+        </div>
 
-        <section id="combat-screen" class="hidden">
-            <div id="combat-info"></div>
-            <div id="combat-actions"></div>
-            <div id="combat-log">Combat initialized.</div>
-        </section>
-    </main>
+        <div id="battle-message" class="battle-message">
+          A training entity blocks your path.
+        </div>
 
-    <footer>
-        THE SERVER // DEVELOPMENT BUILD 0.01
-    </footer>
+        <div id="attack-stage" class="attack-stage hidden">
+          <div class="stage-label">TIME YOUR STRIKE</div>
+          <div class="timing-track">
+            <div class="perfect-zone"></div>
+            <div id="timing-marker"></div>
+          </div>
+          <small>
+            Press ENTER / SPACE when the marker is near the centre.
+          </small>
+        </div>
 
-    <script type="module" src="js/main.js"></script>
+        <div id="dodge-stage" class="dodge-stage hidden">
+          <div class="stage-label">
+            DODGE PHASE — MOVE THE HEART
+          </div>
+          <canvas id="dodge-canvas" width="520" height="260"></canvas>
+          <small>
+            Move with WASD / arrow keys. Avoid incoming projectiles.
+          </small>
+        </div>
+
+        <div id="battle-menu" class="battle-menu"></div>
+        <div id="battle-submenu" class="battle-submenu"></div>
+      </section>
+
+      <div id="dialogue-overlay" class="dialogue-overlay hidden">
+        <div class="dialogue-card">
+          <small id="dialogue-speaker">SYSTEM</small>
+          <p id="dialogue-line"></p>
+          <button id="dialogue-next">CONTINUE</button>
+        </div>
+      </div>
+    </section>
+
+    <aside class="sidebar">
+      <section class="side-card">
+        <div class="side-title">PLAYER STATUS</div>
+        <div class="player-name" id="player-name">PLAYER</div>
+
+        <div class="stat-line">
+          <span>LEVEL</span>
+          <b id="player-level">01</b>
+        </div>
+
+        <div class="stat-line">
+          <span>HP</span>
+          <b id="sidebar-hp">30 / 30</b>
+        </div>
+
+        <div class="hp-track">
+          <i id="sidebar-hp-fill"></i>
+        </div>
+
+        <div class="stat-line">
+          <span>WEAPON</span>
+          <b id="weapon-name">BASIC GLOVE</b>
+        </div>
+      </section>
+
+      <section class="side-card">
+        <div class="side-title">WORLD LOG</div>
+        <div id="world-log">
+          Connection established.<br>
+          Welcome to the Server.
+        </div>
+      </section>
+
+      <section class="side-card controls-card">
+        <div class="side-title">CONTROLS</div>
+        <p><kbd>WASD</kbd> / <kbd>↑↓←→</kbd> Move or select</p>
+        <p><kbd>E</kbd> Interact</p>
+        <p><kbd>ENTER</kbd> Confirm</p>
+        <p><kbd>ESC</kbd> Back</p>
+      </section>
+
+      <button id="save-button" class="utility-button">
+        SAVE GAME
+      </button>
+    </aside>
+  </main>
+
+  <footer>
+    THE SERVER // ORIGINAL STORY MODE // PROTOTYPE 0.01
+  </footer>
+
+  <script type="module" src="js/main.js"></script>
 </body>
 </html>
