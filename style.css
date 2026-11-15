@@ -1,0 +1,101 @@
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #080b13;
+    color: #d9eaff;
+    font-family: monospace;
+}
+
+header {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #164c65;
+    background: #0d1420;
+}
+
+.logo {
+    color: #43dcff;
+    font-size: 20px;
+    font-weight: bold;
+    letter-spacing: 4px;
+}
+
+.status {
+    color: #54ffb0;
+}
+
+main {
+    padding: 25px;
+    max-width: 1000px;
+    margin: auto;
+}
+
+#world, #combat-screen {
+    border: 1px solid #20516a;
+    background: #0c1420;
+    padding: 25px;
+    min-height: 400px;
+}
+
+.location {
+    border-bottom: 1px solid #20516a;
+    padding-bottom: 15px;
+    margin-bottom: 30px;
+}
+
+.location span {
+    color: #43dcff;
+}
+
+h1 {
+    letter-spacing: 3px;
+}
+
+.dummy {
+    text-align: center;
+    padding: 40px 10px;
+    border: 1px solid #28617c;
+    background: #101e2b;
+}
+
+.dummy-icon {
+    font-size: 65px;
+    color: #43dcff;
+}
+
+button {
+    background: #102b3b;
+    color: #43dcff;
+    border: 1px solid #43dcff;
+    padding: 13px 24px;
+    cursor: pointer;
+    font-family: monospace;
+    margin: 8px;
+}
+
+button:hover {
+    background: #1b5068;
+}
+
+.hidden {
+    display: none !important;
+}
+
+#combat-log {
+    margin-top: 25px;
+    padding: 15px;
+    border: 1px solid #20516a;
+    color: #8cc9e9;
+    min-height: 70px;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    color: #526c83;
+}
