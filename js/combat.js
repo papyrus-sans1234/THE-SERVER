@@ -635,7 +635,7 @@ function attemptFlee() {
 
     finishCombat(false);
   } else {
-    setMessage('You couldn't escape!');
+    setMessage("You couldn't escape!");
 
     enemyTurn();
   }
