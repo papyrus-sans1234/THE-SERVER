@@ -30,31 +30,7 @@ import {
   loadGame
 } from './saveSystem.js';
 
-// INITIALIZATION
-
-function initializeGame() {
-  const loaded = loadGame();
-
-  if (!loaded) {
-    log('New connection detected.');
-    log('Entering the Server...');
-  }
-
-  renderGame();
-
-  if (!loaded) {
-    showDialogue(
-      'SYSTEM',
-      [
-        'Connection established.',
-        'Welcome to THE SERVER.',
-        'Your journey begins here.'
-      ]
-    );
-  }
-
-  console.log('THE SERVER initialized.');
-}
+import { showStartScreen } from './startScreen.js';
 
 // RENDERING
 
@@ -65,6 +41,70 @@ function renderGame() {
 
   updateHUD();
 }
+
+// NEW GAME
+
+function startNewGame(createdAvatar) {
+  // Apply the created character.
+  state.player.name = createdAvatar.name;
+  state.avatar = createdAvatar;
+
+  // Reset starting position.
+  state.player.hp = 30;
+  state.player.x = 7;
+  state.player.y = 7;
+
+  state.region = 'THE ARRIVAL ZONE';
+  state.room = 'INITIAL CHAMBER';
+  state.roomId = 'start';
+
+  state.inCombat = false;
+  state.dialogue = null;
+
+  state.flags.dummyDefeated = false;
+
+  log('New connection detected.');
+  log('Entering THE SERVER...');
+
+  renderGame();
+
+  showDialogue(
+    'SYSTEM',
+    [
+      'Connection established.',
+      `Welcome, ${createdAvatar.name}.`,
+      'Your journey begins here.'
+    ]
+  );
+
+  console.log('New game started.');
+}
+
+// CONTINUE
+
+function continueGame() {
+  const loaded = loadGame();
+
+  if (!loaded) {
+    alert('No saved game could be loaded.');
+    showStartScreen();
+    return;
+  }
+
+  renderGame();
+
+  console.log('Saved game loaded.');
+}
+
+// START SCREEN EVENTS
+
+window.addEventListener('server:new-game', event => {
+  startNewGame(event.detail);
+});
+
+window.addEventListener('server:continue-game', () => {
+  continueGame();
+});
 
 // MOVEMENT
 
@@ -148,6 +188,16 @@ document.addEventListener('keydown', event => {
     event.preventDefault();
   }
 
+  // Don't control the game behind the start screen.
+  if (document.getElementById('server-start')) {
+    return;
+  }
+
+  // Don't control the game behind the avatar creator.
+  if (document.getElementById('avatar-creator')) {
+    return;
+  }
+
   if (state.dialogue) {
     if (
       key === 'Enter' ||
@@ -224,6 +274,8 @@ document.getElementById('save-button')
     updateHUD();
   });
 
-// START
+// INITIAL STARTUP
 
-initializeGame();
+showStartScreen();
+
+console.log('THE SERVER title screen loaded.');
